@@ -7,8 +7,21 @@ import java.util.Scanner;
 
 import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 
+/**
+ * Build a graphs from the preprocessed String dataset
+ * 
+ * @author verica
+ *
+ */
 public class FileGraphBuilder {
 	
+	/**
+	 * Build 0-1 symmetric adjacency matrix from the protein-interactions (String) dataset  
+	 * 
+	 * @param fileName: the path to the file containing the dataset
+	 * @return
+	 * @throws FileNotFoundException
+	 */
 	public SparseCCDoubleMatrix2D buildGraph (String fileName) throws FileNotFoundException {
 		HashMap<String, Integer> proteinToId = readNodes(fileName);
 		SparseCCDoubleMatrix2D A = new SparseCCDoubleMatrix2D(proteinToId.size(), proteinToId.size());
@@ -30,6 +43,14 @@ public class FileGraphBuilder {
 	}
 	
 	
+	/**
+	 * Build the symmetric adjacency matrix from the protein-interactions (String) dataset
+	 * where the weight of each link is the combined reliability score for each interaction
+	 * 
+	 * @param fileName
+	 * @return
+	 * @throws FileNotFoundException
+	 */
 	public SparseCCDoubleMatrix2D buildWeightedGraph (String fileName) throws FileNotFoundException {
 		HashMap<String, Integer> proteinToId = readNodes(fileName);
 		SparseCCDoubleMatrix2D A = new SparseCCDoubleMatrix2D(proteinToId.size(), proteinToId.size());
@@ -49,7 +70,16 @@ public class FileGraphBuilder {
 				
 		return A;
 	}
+	 
 	
+	/**
+	 * Collects all the nodes (proteins) within the protein-interaction 
+	 * dataset and maps them to an id
+	 * 
+	 * @param filename
+	 * @return
+	 * @throws FileNotFoundException
+	 */
 	public HashMap<String, Integer> readNodes (String filename) throws FileNotFoundException {
 		HashMap<String, Integer> proteinToId = new HashMap<String, Integer>();
 		String [] tokens;

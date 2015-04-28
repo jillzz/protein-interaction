@@ -1,5 +1,13 @@
 package preprocessing;
 
+/**
+ * Single element within the augmented String dataset
+ * (contains scores for presence of the given interaction
+ *  within other datasets)
+ * 
+ * @author verica
+ *
+ */
 public class ExtendedStringEntry  {
 	private StringEntry stringEntry;
 	
@@ -26,6 +34,12 @@ public class ExtendedStringEntry  {
 	}
 	
 	
+	/**
+	 * Parse a single line in the augmented String dataset
+	 * 
+	 * @param line
+	 * @return
+	 */
 	public static ExtendedStringEntry parseLine (String line) {
 		String [] tokens = line.split(" +");
 		

@@ -8,12 +8,29 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Scanner;
 
+/**
+ * Split filtered ontology files to three subontologies 
+ * (cellular component - CC, molecular function - MF, biological process - BP)
+ * 
+ * @author verica
+ *
+ */
 public class GOSubontology {
 	// subontologies terms
 	private HashSet<String> cc;
 	private HashSet<String> mf;
 	private HashSet<String> bp;
 	
+	
+	/**
+	 * Build three hashsets each with all the terms from one of the
+	 * three subontologies. These will be used later on for filtering.
+	 * 
+	 * @param ccFile
+	 * @param mfFile
+	 * @param bpFile
+	 * @throws FileNotFoundException
+	 */
 	public GOSubontology (String ccFile, String mfFile, String bpFile) throws FileNotFoundException {
 		cc = new HashSet<String>();
 		mf = new HashSet<String>();
@@ -43,6 +60,15 @@ public class GOSubontology {
 	}
 	
 	
+	/**
+	 * Create three new subontology files from give file
+	 * 
+	 * @param file: the file that should be split to subontologies
+	 * @param subCC: the file that will contain cellular component ontology
+	 * @param subMF: the file that will contain molecular function ontology
+	 * @param subBP: the file that will contain biological process ontology
+	 * @throws IOException
+	 */
 	public void splitToSubontologies (String file, String subCC, String subMF, 
 			                                       String subBP) throws IOException {
 		Scanner in = new Scanner (new FileInputStream (file));

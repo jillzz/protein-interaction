@@ -1,5 +1,5 @@
 package preprocessing;
-
+ 
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,13 +11,23 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 
-
+/**
+ * We have protein interactions obtained from different databases,
+ * through different types of experiments, and the idea is to combine
+ * them, calculate their reliability scores, and filter out the unreliable
+ * interactions. 
+ * 
+ * @author verica
+ *
+ */
 public class Preprocessing {
+	// Pregiven scores for every interaction within found these four datasets
 	private static final double HI14_VALUE = 0.95;
 	private static final double VENEKATESAN_VALUE = 0.85;
 	private static final double YU11_VALUE = 0.85;
 	private static final double LITBM13_VALUE = 0.90;
 	
+	// the filenames for the datasets
 	private String stringData;
 	private String stringToEntrez;
 	private String hi14;
@@ -25,18 +35,33 @@ public class Preprocessing {
 	private String yu11;
 	private String litbm13;
 		
-	private String output;
-	
-	private ArrayList<StringEntry> stringList;
-	private HashMap<String, Integer> entrezMap;
-	private HashSet<String> hi14Pair;
+	private String output;                               // the output file for the preprocessed data
+	 
+	private ArrayList<StringEntry> stringList;           // every line of the string dataset as element
+	private HashMap<String, Integer> entrezMap;          // mapping between two different naming conventions
+	private HashSet<String> hi14Pair;                    // every element is a pair of two proteins as string
 	private HashSet<String> venekatesanPair;
 	private HashSet<String> yu11Pair;
 	private HashSet<String> litbm13Pair;
 	
-	private ArrayList<ExtendedStringEntry> extStringList;	
+	// every element is one line in the extended string dataset
+	// that now contains the scores id the given interaction is also
+	// present in the other datasets
+	private ArrayList<ExtendedStringEntry> extStringList;    
 
 	
+	/**
+	 * Read in all the datasets
+	 * 
+	 * @param stringData
+	 * @param stringToEntrez
+	 * @param hi14
+	 * @param venekatesan
+	 * @param yu11
+	 * @param litbm13
+	 * @param output
+	 * @throws FileNotFoundException
+	 */
 	public Preprocessing(String stringData, String stringToEntrez, String hi14,
 			String venekatesan, String yu11, String litbm13, String output) throws FileNotFoundException {
 		this.stringData = stringData;
@@ -64,6 +89,11 @@ public class Preprocessing {
 	}
 
 	
+	/**
+	 * Read in the String dataset
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	private void readStringData () throws FileNotFoundException {
 		Scanner in = new Scanner(new FileInputStream(stringData));
 		in.nextLine();
@@ -75,6 +105,12 @@ public class Preprocessing {
 	}
 	
 	
+	/**
+	 * Read in String to Entrez mappings
+	 * (mappings between two different naming conventions)
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	private void readMappings () throws FileNotFoundException {
 		Scanner in = new Scanner(new FileInputStream(stringToEntrez));
 		in.nextLine();
@@ -89,6 +125,11 @@ public class Preprocessing {
 	}
 	
 	
+	/**
+	 * Read in the HI-II-14 dataset
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	private void readHi14Data () throws FileNotFoundException {
 		Scanner in = new Scanner(new FileInputStream(hi14));
 		in.nextLine();
@@ -97,12 +138,17 @@ public class Preprocessing {
 			tokens = in.nextLine().trim().split("\t");
 			hi14Pair.add(String.format("%s %s", tokens[0], tokens[2]));
 		}
-		in.close();
+		in.close(); 
 		
 		System.out.println("Hi14 data read-in");
 	}
 	
 	
+	/**
+	 * Read in the Venekatesan-09 dataset
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	private void readVenekatesanData () throws FileNotFoundException {
 		Scanner in = new Scanner(new FileInputStream(venekatesan));
 		in.nextLine();
@@ -117,6 +163,11 @@ public class Preprocessing {
 	}
 	
 	
+	/**
+	 * Read in the Yu-11 dataset
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	private void readYu11Data () throws FileNotFoundException {
 		Scanner in = new Scanner(new FileInputStream(yu11));
 		in.nextLine();
@@ -131,6 +182,11 @@ public class Preprocessing {
 	}
 	
 	
+	/**
+	 * Read in the Lit-BM-13 dataset
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	private void readLitbm13Data () throws FileNotFoundException {
 		Scanner in = new Scanner(new FileInputStream(litbm13));
 		in.nextLine();
@@ -145,6 +201,11 @@ public class Preprocessing {
 	}
 
 	
+	/**
+	 * Build the combined dataset by adding scores for every interaction
+	 * in String that is also present in the other datasets
+	 * 
+	 */
 	public void buildCombinedData () {
 		String pair1, pair2;
 		double hi14Score, venekatesanScore, yu11Score, litbm13Score, finalScore;
@@ -188,6 +249,11 @@ public class Preprocessing {
 	}
 	
 	
+	/**
+	 * Output the combined dataset to a file
+	 * 
+	 * @throws IOException
+	 */
 	public void outputCombinedData () throws IOException  {
 		PrintWriter out = new PrintWriter (
 				new FileWriter (output));
@@ -200,6 +266,13 @@ public class Preprocessing {
 	}
 	
 	
+	/**
+	 * Filter out the interactions with score beyond the given minimum
+	 * (those are considered unreliable)
+	 * 
+	 * @param minScore
+	 * @throws IOException
+	 */
 	public void outputbyScore (double minScore) throws IOException  {
 		PrintWriter out = new PrintWriter (
 				new FileWriter (String.format("data/human_ppi_data_%d", (int) minScore)));

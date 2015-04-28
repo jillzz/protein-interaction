@@ -1,6 +1,13 @@
 package preprocessing;
 
+/**
+ * Single entry (line) within the String dataset
+ * 
+ * @author verica
+ *
+ */
 public class StringEntry {
+	// Columns within String dataset
 	private String protein1;
 	private String protein2;
 	private double neighborhood;
@@ -30,6 +37,12 @@ public class StringEntry {
 	}
 
 
+	/**
+	 * Parse a single line within the String dataset
+	 * 
+	 * @param line
+	 * @return
+	 */
 	public static StringEntry parseLine (String line) {
 		String [] tokens = line.split(" +");
 		
