@@ -1,21 +1,27 @@
 package gene_ontology;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
 
+	
 	public static void main(String[] args) {
-		/*
 		try {
 			filtering();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		*/
-		
+				
 		try {
 			splitting();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			irrelevantTermsFiltering();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -66,6 +72,29 @@ public class Main {
                                  "data/go/split/human_ppi900_go_mf_conf.tsv", 
                                  "data/go/split/human_ppi900_go_bp_conf.tsv");
 		
+	}
+	
+	
+	public static void irrelevantTermsFiltering () throws IOException {
+		RelevantGOTerms t = new RelevantGOTerms ();
+		t.findProteinsPerTerm();
+		t.buildAnnotationNetwork();
+		t.countPoteinsPerTerm();
+		t.outputRelevantTerms("data/go/relevant-terms");
+			
+		File dir = new File("data/go/split");
+		File [] filesList = dir.listFiles();
+		String outputFile;
+		
+		for (File file : filesList) {
+		    if (file.isFile()) {
+		        outputFile = String.format ("%s_clean.tsv", 
+							 	file.getCanonicalFile().toString().split("\\.")[0]);
+				t.cleanAnnotationFile(file.getCanonicalFile().toString(), 
+							          "data/go/relevant-terms", 
+							          outputFile);				
+		    }
+		}
 	}
 	
 
