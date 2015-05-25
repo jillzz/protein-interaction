@@ -14,8 +14,10 @@ def main():
     print nx.number_connected_components(G)
     print
     #sg = list(nx.connected_component_subgraphs(g))[0]
-    plot_degree_dist (G, 'figures/degree_distribution700.pdf')
 
+    #plot_degree_dist (G, 'figures/degree_distribution900.pdf')
+    #pearson = nx.degree_pearson_correlation_coefficient(G)
+    #plot_clustering_spectrum(G, 'figures/clustering_spectrum700.pdf')
 
 
 

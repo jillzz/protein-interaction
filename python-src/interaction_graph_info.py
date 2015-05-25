@@ -28,3 +28,36 @@ def plot_degree_dist (graph, path = "figure.pdf"):
     plt.xlabel("Log degree")
     plt.axis('tight')
     plt.savefig(path)
+
+
+#-------------------------------------------------------------------------------
+
+def plot_clustering_spectrum (graph, path):
+    """Plot the clusttering spectrum of the graph and save the figure
+       at the given path. On X-axis we have degrees and on Y-axis we have
+       average clustering coefficients of the nodes that have that degree"""
+
+    node_to_degree = graph.degree()
+    node_to_clustering = nx.clustering(graph)
+    degree_to_clustering = {}
+
+    # calculate average clustering coefficients for nodes with certain degree
+    for node in node_to_degree:
+        deg = node_to_degree[node]
+        tmp = degree_to_clustering.get(deg, [])
+        tmp.append(node_to_clustering[node])
+        degree_to_clustering[deg] = tmp
+
+    for degree in degree_to_clustering:
+        tmp = degree_to_clustering[degree]
+        degree_to_clustering[degree] = float(sum(tmp)) / len(tmp)
+
+    x = sorted(degree_to_clustering.keys(), reverse = True)
+    y = [degree_to_clustering[i] for i in x]
+
+    plt.loglog(x, y, 'b-', marker = '.')
+    plt.title("Clustering Spectrum")
+    plt.ylabel("Average clustering coefficient")
+    plt.xlabel("Degree")
+    plt.axis('tight')
+    plt.savefig(path)
