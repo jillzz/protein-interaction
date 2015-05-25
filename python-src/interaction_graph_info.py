@@ -4,7 +4,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def plot_degree_dist (graph, path = "figure.pdf"):
+def plot_degree_dist (graph, path):
     """Plot log-log degree distribution of the graph and save the figure
        at the given path. On X-axis we have degrees and on Y-axis we have
        the percentage of nodes that have that degree"""
@@ -61,3 +61,43 @@ def plot_clustering_spectrum (graph, path):
     plt.xlabel("Degree")
     plt.axis('tight')
     plt.savefig(path)
+
+
+#-------------------------------------------------------------------------------
+
+def plot_shortest_path_spectrum (graph, path):
+    #TODO
+    paths = nx.all_pairs_shortest_path_length(graph)
+    print 'OK'
+    with open('shortest_paths.txt') as out:
+        out.write(paths)
+
+
+#-------------------------------------------------------------------------------
+
+def plot_closeness_dist (graph, path):
+    """Plot distribution of closeness centrality of the graph and save the figure
+       at the given path. On X-axis we have closeness centrality values and on
+       Y-axis we have percentage of the nodes that have that closeness value"""
+
+    N = float(graph.order())
+    node_to_closeness = nx.closeness_centrality(graph)
+    closeness_to_percent = {}
+
+    # calculate percentages of nodes with certain closeness value
+    for node in node_to_closeness:
+        closeness_to_percent[node_to_closeness[node]] = 1 + \
+                closeness_to_percent.get(node_to_closeness[node], 0)
+    for c in closeness_to_percent:
+        closeness_to_percent[c] = closeness_to_percent[c] / N * 100
+
+    x = sorted(closeness_to_percent.keys(), reverse = True)
+    y = [closeness_to_percent[i] for i in x]
+
+    plt.loglog(x, y, 'b-', marker = '.')
+    plt.title("Closeness Centrality Distribution")
+    plt.ylabel("Percentage")
+    plt.xlabel("Closeness value")
+    plt.axis('tight')
+    plt.savefig(path)
+
