@@ -23,6 +23,7 @@ def main():
     #plot_clustering_spectrum (G, 'figures/clustering_spectrum700.pdf')
     #TODO: plot_shortest_path_spectrum(G, '')
     #plot_closeness_dist (G, 'figures/closeness_distribution700.pdf')
+    plot_betweenness_dist (G, 'figures/betweenness_distribution700.pdf')
 
 
 

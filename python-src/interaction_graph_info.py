@@ -101,3 +101,32 @@ def plot_closeness_dist (graph, path):
     plt.axis('tight')
     plt.savefig(path)
 
+
+#-------------------------------------------------------------------------------
+
+def plot_betweenness_dist (graph, path):
+    """Plot distribution of betweenness centrality of the graph and save the figure
+       at the given path. On X-axis we have betweenness centrality values and on
+       Y-axis we have percentage of the nodes that have that betweenness value.
+       k is the number of samples for estimating the betweenness centrality."""
+
+    N = float(graph.order())
+    node_to_betweenness = nx.betweenness_centrality(graph)
+    betweenness_to_percent = {}
+
+    # calculate percentages of nodes with certain betweeness value
+    for node in node_to_betweenness:
+        betweenness_to_percent[node_to_betweenness[node]] = 1 + \
+                betweenness_to_percent.get(node_to_betweenness[node], 0)
+    for c in betweenness_to_percent:
+        betweenness_to_percent[c] = betweenness_to_percent[c] / N * 100
+
+    x = sorted(betweenness_to_percent.keys(), reverse = True)
+    y = [betweenness_to_percent[i] for i in x]
+
+    plt.loglog(x, y, 'b-', marker = '.')
+    plt.title("Betweenness Centrality Distribution")
+    plt.ylabel("Percentage")
+    plt.xlabel("Betweenness value")
+    plt.axis('tight')
+    plt.savefig(path)
