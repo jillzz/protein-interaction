@@ -4,7 +4,10 @@
 import networkx as nx
 
 
+#-------------------------------------------------------------------------------
+
 def build_graph (path):
+    """Build the graph from datafile at the given path"""
     tokens = []
     protein_to_id = {}
     ID = 0
@@ -24,3 +27,13 @@ def build_graph (path):
     id_to_protein = dict((protein_to_id[k], k) for k in protein_to_id.keys())
 
     return G, id_to_protein
+
+
+#-------------------------------------------------------------------------------
+
+def get_largest_componenet (graph):
+    """Get the largest connected componenet from the graph"""
+    SG = sorted( list(nx.connected_component_subgraphs(graph)), \
+                 key = lambda sg: sg.order(), \
+                 reverse = True)[0]
+    return SG
