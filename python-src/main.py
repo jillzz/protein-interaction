@@ -6,7 +6,7 @@ from interaction_graph_builder import *
 from interaction_graph_info import *
 
 def main():
-    G, id_to_protein = build_graph('../data/human_ppi_data_700')
+    G, id_to_protein = build_graph('../data/human_ppi_data_900')
     print 'Graph built!'
 
     """
@@ -21,9 +21,9 @@ def main():
     #plot_degree_dist (G, 'figures/degree_distribution900.pdf')
     #pearson = nx.degree_pearson_correlation_coefficient(G)
     #plot_clustering_spectrum (G, 'figures/clustering_spectrum700.pdf')
-    #TODO: plot_shortest_path_spectrum(G, '')
+    plot_shortest_path_spectrum (G, 'figures/distance_spectrum900.pdf', 'shortest_paths_900.txt')
     #plot_closeness_dist (G, 'figures/closeness_distribution700.pdf')
-    plot_betweenness_dist (G, 'figures/betweenness_distribution700.pdf')
+    #plot_betweenness_dist (G, 'figures/betweenness_distribution700.pdf')
 
 
 

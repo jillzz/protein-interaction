@@ -4,6 +4,21 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
+#-------------------------------------------------------------------------------
+
+def read_in_shortest_paths(path):
+    paths = []
+    with open(path, 'r') as in_file:
+        for line in in_file:
+            tokens = line.split()
+            paths.append(int(tokens[2]))
+
+    return paths
+
+
+#-------------------------------------------------------------------------------
+
 def plot_degree_dist (graph, path):
     """Plot log-log degree distribution of the graph and save the figure
        at the given path. On X-axis we have degrees and on Y-axis we have
@@ -65,12 +80,25 @@ def plot_clustering_spectrum (graph, path):
 
 #-------------------------------------------------------------------------------
 
-def plot_shortest_path_spectrum (graph, path):
-    #TODO
-    paths = nx.all_pairs_shortest_path_length(graph)
-    print 'OK'
-    with open('shortest_paths.txt') as out:
-        out.write(paths)
+def plot_shortest_path_spectrum (graph, path, paths_data):
+    paths = read_in_shortest_paths(paths_data)
+    pairs = float(graph.order() ** 2)
+
+    d_paths = {}
+    for i in paths:
+        d_paths[i] = 1 + d_paths.get(i, 0)
+    for i in d_paths:
+        d_paths[i] *= (100.0 / pairs)
+
+    x = sorted(d_paths.keys(), reverse = True)
+    y = [d_paths[i] for i in x]
+
+    plt.loglog(x, y, 'b-', marker = '.')
+    plt.title("Shortest Paths Spectrum")
+    plt.ylabel("Percent of pairs")
+    plt.xlabel("Distance")
+    plt.axis('tight')
+    plt.savefig(path)
 
 
 #-------------------------------------------------------------------------------
