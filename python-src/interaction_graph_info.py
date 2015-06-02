@@ -164,8 +164,7 @@ def read_in_annotations(annotation_file):
     with open(annotation_file, 'r') as in_file:
         for line in in_file:
             tokens = line.split('\t')
-            print tokens[1], tokens[3]
-            if tokens[1] not in protein_to_functions:
+            if not tokens[1] in protein_to_functions:
                 protein_to_functions[tokens[1]] = set()
             protein_to_functions[tokens[1]].add(tokens[3])
 
@@ -190,36 +189,34 @@ def plot_proteins_sharing_function(id_to_protein, \
        annotation_file: path to the file that cointains proteins and their functions
        distance_file: path to the file that contains shortest paths between the nodes"""
 
-    paths_dict = read_in_shortest_paths(distance_file)
     protein_to_functions = read_in_annotations(annotation_file)
 
     distance_to_count = {}
-    for pair in paths_dict:
-        distance_to_count[paths_dict[pair]] = \
-                    1 + distance_to_count.get(paths_dict[pair], 0)
-
     distance_to_common = {}
-    for pair in paths_dict:
-        pp1 = id_to_protein[pair[0]]
-        pp2 = id_to_protein[pair[1]]
-        if pp1 in protein_to_functions and pp2 in protein_to_functions and \
-                common_elements(protein_to_functions[pp1], protein_to_functions[pp2]):
-            distance_to_common[paths_dict[pair]] = \
-                        1 + distance_to_common.get(paths_dict[pair], 0)
-
-    print distance_to_count
-    print distance_to_common
+    for i in xrange(8):
+        with open('%s_%d' % (distance_file, i), 'r') as in_file:
+            for line in in_file:
+                tokens = line.split()
+                p1 = id_to_protein[int(tokens[0])]
+                p2 = id_to_protein[int(tokens[1])]
+                d = int(tokens[2])
+                distance_to_count[d] = 1 + distance_to_count.get(d, 0)
+                if p1 in protein_to_functions and \
+                        p2 in protein_to_functions and \
+                        common_elements(protein_to_functions[p1], protein_to_functions[p2]):
+                    distance_to_common[d] = 1 + distance_to_common.get(d, 0)
 
     for d in distance_to_common:
         distance_to_common[d] *= (100.0 / distance_to_count[d])
 
     # Plotting
-    x = range(0, max(distance_to_common.keys())+1)
+    diameter = graph_diameter(distance_file)
+    x = range(0, diameter + 1)
     y = [distance_to_common.get(i, 0) for i in x]
 
-    plt.loglog(x, y, 'b-', marker = '.')
-    plt.title("Proteins sharing common functions depending on the distance between them")
-    plt.ylabel("Percentage of protein pairs with atleast one common function")
+    plt.bar(x, y, width = 1, color = 'b')
+    plt.title("Proteins sharing common functions\n depending on the distance between them")
+    plt.ylabel("Percent of pairs sharing common functions")
     plt.xlabel("Distance")
     plt.axis('tight')
     plt.savefig(path)

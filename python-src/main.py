@@ -15,17 +15,17 @@ def main():
     #plot_degree_dist (G, 'figures/degree_distribution900.pdf')
     #pearson = nx.degree_pearson_correlation_coefficient(G)
     #plot_clustering_spectrum (G, 'figures/clustering_spectrum700.pdf')
-    plot_shortest_path_spectrum (G, 'figures/distance_spectrum900_new.pdf', \
-                                 'distances_data/shortest_paths_900_improved')
+    #plot_shortest_path_spectrum (G, 'figures/distance_spectrum900_new.pdf', \
+    #                             'distances_data/shortest_paths_900_improved')
     #plot_closeness_dist (G, 'figures/closeness_distribution700.pdf')
     #plot_betweenness_dist (G, 'figures/betweenness_distribution700.pdf')
 
-    """
+
     plot_proteins_sharing_function(id_to_protein, \
-                                   go700, \
-                                   'shortest_paths_700.txt', \
-                                   'figures/function_sharing700.pdf')
-    """
+                                   go900, \
+                                   'distances_data/shortest_paths_900_improved', \
+                                   'figures/function_sharing900.pdf')
+
 
 
 
