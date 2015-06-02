@@ -24,7 +24,7 @@ def build_graph (path):
                 ID += 1
             G.add_edge(protein_to_id[tokens[0]], protein_to_id[tokens[1]])
 
-    id_to_protein = dict((protein_to_id[k], k) for k in protein_to_id.keys())
+    id_to_protein = dict((protein_to_id[k], k.split('.')[1]) for k in protein_to_id.keys())
 
     return G, id_to_protein
 
