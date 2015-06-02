@@ -3,6 +3,7 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
+from graph_utility import *
 
 
 #-------------------------------------------------------------------------------
@@ -68,43 +69,26 @@ def plot_clustering_spectrum (graph, path):
 
 #-------------------------------------------------------------------------------
 
-def read_in_shortest_paths(path):
-    """Read in the file that contains the shortest pahts"""
-    paths = {}
-    with open(path, 'r') as in_file:
-        for line in in_file:
-            tokens = line.split()
-            t0 = int(tokens[0])
-            t1 = int(tokens[1])
-            if (t0, t1) in paths:
-                print 'Weird: %d-%d: %d' % (t0, t1, int(tokens[2]))
-            paths[(t0, t1)] = int(tokens[2])
-
-    return paths
-
-
 def plot_shortest_path_spectrum (graph, path, paths_data):
     """Plot distribution of shortest paths of the graph and save the figure
        at the given path. On X-axis we have distance values and on Y-axis we
        have percentage of node pairs that have that distance value"""
 
-    print 'OK0'
-    paths_dict = read_in_shortest_paths(paths_data)
-    paths = [paths_dict[i] for i in paths_dict]
+    diameter = graph_diameter(paths_data)
+    pairs = graph.order() * (graph.order()-1) * 0.5
 
-    pairs = graph.order() * (graph.order()-1) * 0.2
-    print 'OK1'
-    d_paths = {}
-    for i in paths:
-        d_paths[i] = 1 + d_paths.get(i, 0)
-    for i in d_paths:
-        d_paths[i] *= (100.0 / pairs)
+    distances_count = [0 for i in xrange(diameter + 1)]
+    for i in xrange(8):
+        with open('%s_%d' % (paths_data, i), 'r') as in_file:
+            for line in in_file:
+                tokens = line.split()
+                distances_count[int(tokens[2])] += 1
 
-    print 'OK2'
-    x = range(0, max(paths) + 1)
-    y = [d_paths.get(i, 0) for i in x]
-    print 'OK3'
-    plt.loglog(x, y, 'b-', marker = '.')
+    for i in xrange(diameter + 1):
+        distances_count[i] *= (100.0 / pairs)
+
+    y = distances_count
+    plt.loglog(y, 'b-', marker = '.')
     plt.title("Shortest Paths Spectrum")
     plt.ylabel("Percent of pairs")
     plt.xlabel("Distance")

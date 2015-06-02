@@ -49,13 +49,31 @@ def save_all_shortest_paths(graph, path):
 
 #-------------------------------------------------------------------------------
 
+def graph_diameter(path):
+    """Find the graph diameter from shortest path's files generated with
+       save_all_shortest_paths function"""
+    max_dist = -1;
+    for i in xrange(8):
+        with open('%s_%d' % (path, i), 'r') as in_file:
+            for line in in_file:
+                tokens = line.split()
+                d = int(tokens[2])
+                if d > max_dist:
+                    max_dist = d
+
+    return max_dist
+
+
+#-------------------------------------------------------------------------------
+
 def main():
     """
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
     print 'Calculating now...'
     save_all_shortest_paths(G, 'shortest_paths_900_improved')
     """
-
+    diameter = graph_diameter('distances_data/shortest_paths_900_improved')
+    print "Graph 900 diameter: %d" % diameter
 
 #-------------------------------------------------------------------------------
 
