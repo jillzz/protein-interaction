@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import networkx as nx
+import scipy.io
+import itertools
 from graph_utility import *
 from interaction_graph_builder import *
 
@@ -36,22 +38,31 @@ def graph_structure_jaccard(graph, graph_jaccard, path):
         similarity metric. """
     A = nx.to_scipy_sparse_matrix(graph)
     W = nx.to_scipy_sparse_matrix(graph_jaccard)
-    #TODO
+    W2 = (A * W) + (W * A)
+
+    tmp = W2.tocoo()
+    with open(path, 'w') as out:
+        for i, j, w in itertools.izip(tmp.row, tmp.col, tmp.data):
+            out.write('%d %d %f\n' % (i, j, w))
 
 
 #-------------------------------------------------------------------------------
 
 def main():
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
-    go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
+    #go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
     #graph_content_jaccard(G, id_to_protein, go900, 'graphs/jaccard_content_900')
 
-    G1 = build_graph_from_edgelist('graphs/jaccard_content_900')
+    G1 = build_graph_from_edgelist('graphs/jaccard_content_900', G.order())
+    graph_structure_jaccard(G, G1, 'graphs/jaccard_structure_900')
+    G2 = build_graph_from_edgelist('graphs/jaccard_structure_900', G.order())
 
-    A = nx.to_scipy_sparse_matrix(G)
-    A1 = nx.to_scipy_sparse_matrix(G1)
-    print A.get_shape()
-    print A1.get_shape()
+    print nx.info(G)
+    print
+    print nx.info(G1)
+    print
+    print nx.info(G2)
+
 
 #-------------------------------------------------------------------------------
 
