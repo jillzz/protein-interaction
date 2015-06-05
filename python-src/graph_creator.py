@@ -36,9 +36,14 @@ def graph_content_jaccard(graph, id_to_protein, annotation_file, path):
 def graph_structure_jaccard(graph, graph_jaccard, path):
     """ Builds interaction graph with structure based weighs using Jaccard
         similarity metric. """
-    A = nx.to_scipy_sparse_matrix(graph)
+    A = scipy.sparse.csr_matrix(nx.google_matrix(graph, alpha = 1, weight = 'weight'))
     W = nx.to_scipy_sparse_matrix(graph_jaccard)
-    W2 = (A * W) + (W * A)
+    W2 = ( (W * A) + (A.transpose() * W) )*0.5
+
+    # rescaling  (max'-min')/(max-min)(v-min)+min'
+    max_w = W.max()
+    max_w2 = W2.max()
+    W2 = W2.multiply(max_w / max_w2)
 
     tmp = W2.tocoo()
     with open(path, 'w') as out:
