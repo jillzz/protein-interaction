@@ -19,13 +19,15 @@ def main():
     #                             'distances_data/shortest_paths_900_improved')
     #plot_closeness_dist (G, 'figures/closeness_distribution700.pdf')
     #plot_betweenness_dist (G, 'figures/betweenness_distribution700.pdf')
+    #plot_proteins_sharing_function(id_to_protein, \
+    #                               go900, \
+    #                               'distances_data/shortest_paths_900_improved', \
+    #                               'figures/function_sharing900.pdf')
 
-
-    plot_proteins_sharing_function(id_to_protein, \
+    plot_function_first_appearance(id_to_protein, \
                                    go900, \
-                                   'distances_data/shortest_paths_900_improved', \
-                                   'figures/function_sharing900.pdf')
-
+                                   'distances_data/shortest_paths_900_sorted', \
+                                   'figures/function_appearance900.pdf', 14)
 
 
 

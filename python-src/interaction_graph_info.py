@@ -157,28 +157,6 @@ def plot_betweenness_dist (graph, path):
 
 #-------------------------------------------------------------------------------
 
-
-def read_in_annotations(annotation_file):
-    """Read in the file that contains the protein annotations"""
-    protein_to_functions = {}
-    with open(annotation_file, 'r') as in_file:
-        for line in in_file:
-            tokens = line.split('\t')
-            if not tokens[1] in protein_to_functions:
-                protein_to_functions[tokens[1]] = set()
-            protein_to_functions[tokens[1]].add(tokens[3])
-
-    return protein_to_functions
-
-
-def common_elements(set1, set2):
-    """Find if two sets have any common element"""
-    for element in set1:
-        if element in set2:
-            return True
-    return False
-
-
 def plot_proteins_sharing_function(id_to_protein, \
                                    annotation_file, distance_file, path):
     """Plot histogram of proteins sharing al least one common functiopn depending
@@ -222,4 +200,46 @@ def plot_proteins_sharing_function(id_to_protein, \
     plt.savefig(path)
 
 
+#-------------------------------------------------------------------------------
 
+def plot_function_first_appearance(id_to_protein, annotation_file, \
+                                   distance_file, path, diameter):
+    """ TODO: Write documentation
+       Plot histogram of proteins sharing al least one common functiopn depending
+       on the distance between them and save the figure at the given path.
+       On X-axis we have the distance and on Y-axis we have percentage of pairs
+       that have at least one common function.
+       id_to_protein: dictionary where each node in the graph maps to a protein
+       annotation_file: path to the file that cointains proteins and their functions
+       distance_file: path to the file that contains shortest paths between the nodes"""
+
+    protein_to_functions = read_in_annotations(annotation_file)
+
+    distance_to_appearance = {}
+    with open(distance_file, 'r') as in_file:
+        for line in in_file:
+            tokens = line.split()
+            p1 = int(tokens[0])
+            pp1 = id_to_protein[p1]
+            p2 = int(tokens[1])
+            pp2 = id_to_protein[p2]
+            d = int(tokens[2])
+            if pp1 in protein_to_functions and pp2 in protein_to_functions:
+                intersection = protein_to_functions[pp1].intersection(protein_to_functions[pp2])
+                protein_to_functions[pp1].difference_update(intersection)
+                protein_to_functions[pp2].difference_update(intersection)
+                distance_to_appearance[d] = distance_to_appearance.get(d, 0) + \
+                                            (2 * len(intersection))
+
+    normalizer = float(sum(distance_to_appearance.values()))
+
+    # Plotting
+    x = range(0, diameter + 1)
+    y = [distance_to_appearance.get(i, 0) / normalizer for i in x]
+
+    plt.bar(x, y, width = 1, color = 'b')
+    plt.title("Number of functions first appearing at given distance")
+    plt.ylabel("Normalized number of functions")
+    plt.xlabel("Distance")
+    plt.axis('tight')
+    plt.savefig(path)

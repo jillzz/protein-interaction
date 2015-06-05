@@ -66,14 +66,60 @@ def graph_diameter(path):
 
 #-------------------------------------------------------------------------------
 
+def combine_and_sort_distance_files(distance_files, path):
+    """Combine all distance files into single file with lines sorted by
+       distance and save the new file at the given path"""
+    diameter = graph_diameter(distance_files)
+
+    for k in xrange(1, diameter + 1):
+        for i in xrange(8):
+            with open('%s_%d' % (distance_files, i), 'r') as in_file:
+                for line in in_file:
+                    tokens = line.split()
+                    d = int(tokens[2])
+                    if d == k:
+                        with open(path, 'a') as out:
+                            out.write(line)
+
+
+#-------------------------------------------------------------------------------
+
+def read_in_annotations(annotation_file):
+    """ Read in the file that contains the protein annotations, and return
+        protein to function dictionary """
+    protein_to_functions = {}
+    with open(annotation_file, 'r') as in_file:
+        for line in in_file:
+            tokens = line.split('\t')
+            if not tokens[1] in protein_to_functions:
+                protein_to_functions[tokens[1]] = set()
+            protein_to_functions[tokens[1]].add(tokens[3])
+
+    return protein_to_functions
+
+
+#-------------------------------------------------------------------------------
+
+def common_elements(set1, set2):
+    """ Find if two sets have any common element """
+    for element in set1:
+        if element in set2:
+            return True
+    return False
+
+
+#-------------------------------------------------------------------------------
+
 def main():
     """
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
     print 'Calculating now...'
     save_all_shortest_paths(G, 'shortest_paths_900_improved')
     """
-    diameter = graph_diameter('distances_data/shortest_paths_900_improved')
-    print "Graph 900 diameter: %d" % diameter
+
+    combine_and_sort_distance_files('distances_data/shortest_paths_900_improved', \
+                                    'distances_data/shortest_paths_900_sorted')
+
 
 #-------------------------------------------------------------------------------
 

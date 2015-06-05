@@ -37,3 +37,23 @@ def get_largest_componenet (graph):
                  key = lambda sg: sg.order(), \
                  reverse = True)[0]
     return SG
+
+
+#-------------------------------------------------------------------------------
+
+def build_graph_from_edgelist(path):
+    """Build undirected graph from file in edgelist format,
+       'nodeID nodeID [weight]' where weight is optional"""
+    G = nx.Graph()
+    with open(path, 'r') as in_file:
+        for line in in_file:
+            tokens = line.split()
+            node1 = int(tokens[0])
+            node2 = int(tokens[1])
+            G.add_edge(node1, node2)
+            if len(tokens) > 2:
+                w = float(tokens[2])
+                G[node1][node2]['weight'] = w
+
+    return G
+
