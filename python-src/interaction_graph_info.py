@@ -204,14 +204,16 @@ def plot_proteins_sharing_function(id_to_protein, \
 
 def plot_function_first_appearance(id_to_protein, annotation_file, \
                                    distance_file, path, diameter):
-    """ TODO: Write documentation
-       Plot histogram of proteins sharing al least one common functiopn depending
-       on the distance between them and save the figure at the given path.
-       On X-axis we have the distance and on Y-axis we have percentage of pairs
-       that have at least one common function.
-       id_to_protein: dictionary where each node in the graph maps to a protein
-       annotation_file: path to the file that cointains proteins and their functions
-       distance_file: path to the file that contains shortest paths between the nodes"""
+    """ Plot histogram of percentage of function annotations of a protein,
+        appearing for the first time in other proteins of distance k from the
+        given protein. Save the histogram at the given path.
+        On X-axis we have the distance and on Y-axis we have normalized number
+        of function appearances at distance d.
+        id_to_protein: dictionary where each node in the graph maps to a protein
+        annotation_file: path to the file that cointains proteins and their functions
+        distance_file: path to the file that contains shortest paths between the nodes
+        diameter: the diameter of the graph
+    """
 
     protein_to_functions = read_in_annotations(annotation_file)
 
