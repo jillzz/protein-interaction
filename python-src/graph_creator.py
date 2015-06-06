@@ -46,17 +46,15 @@ def graph_content_jaccard(graph, id_to_protein, annotation_file, path):
 
 #-------------------------------------------------------------------------------
 
-def graph_structure_jaccard(graph, graph_jaccard, path):
+def graph_structure_jaccard(graph, content_graph, path):
     """ Builds interaction graph with structure based weighs using Jaccard
         similarity metric, and save it at the given path """
     A = scipy.sparse.csr_matrix(nx.google_matrix(graph, alpha = 1, weight = 'weight'))
-    W = nx.to_scipy_sparse_matrix(graph_jaccard)
-    W2 = ( (W * A) + (A.transpose() * W) )*0.5
-
-    # rescaling  (max'-min')/(max-min)(v-min)+min'
-    max_w = W.max()
-    max_w2 = W2.max()
-    W2 = W2.multiply(max_w / max_w2)
+    W = nx.to_scipy_sparse_matrix(content_graph)
+    W2 = (W.dot(A) + A.transpose().dot(W)) * 0.5
+    # rescaling in range 0-1
+    max_val = W2.max()
+    W2 = W2.multiply(1.0 / max_val)
 
     save_matrix_to_edgelist(W2, path)
 
@@ -80,16 +78,11 @@ def main():
     #go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
     #graph_content_jaccard(G, id_to_protein, go900, 'graphs/jaccard_content_900')
     G1 = build_graph_from_edgelist('graphs/jaccard_content_900', G.order())
-    #graph_structure_jaccard(G, G1, 'graphs/jaccard_structure_900')
+    graph_structure_jaccard(G, G1, 'graphs/jaccard_structure_900')
+
     G2 = build_graph_from_edgelist('graphs/jaccard_structure_900', G.order())
     graph_hybrid_jaccard(G1, G2, 'graphs/jaccard_hybrid_900')
-    G3 = build_graph_from_edgelist('graphs/jaccard_hybrid_900', G.order())
-
-    print nx.info(G1)
-    print
-    print nx.info(G2)
-    print
-    print nx.info(G3)
+    #G3 = build_graph_from_edgelist('graphs/jaccard_hybrid_900', G.order())
 
 
 #-------------------------------------------------------------------------------
