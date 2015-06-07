@@ -1,0 +1,3 @@
+# Calculate Resnik similarity
+
+s <- goSim("GO:0005525", "GO:0005525", ont = "MF", organism = "human", measure = "Resnik")

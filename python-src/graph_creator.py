@@ -75,14 +75,15 @@ def graph_hybrid_jaccard(content_graph, structure_graph, path):
 
 def main():
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
-    #go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
+    go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
     #graph_content_jaccard(G, id_to_protein, go900, 'graphs/jaccard_content_900')
-    G1 = build_graph_from_edgelist('graphs/jaccard_content_900', G.order())
-    graph_structure_jaccard(G, G1, 'graphs/jaccard_structure_900')
+    #G1 = build_graph_from_edgelist('graphs/jaccard_content_900', G.order())
+    #graph_structure_jaccard(G, G1, 'graphs/jaccard_structure_900')
 
-    G2 = build_graph_from_edgelist('graphs/jaccard_structure_900', G.order())
-    graph_hybrid_jaccard(G1, G2, 'graphs/jaccard_hybrid_900')
+    #G2 = build_graph_from_edgelist('graphs/jaccard_structure_900', G.order())
+    #graph_hybrid_jaccard(G1, G2, 'graphs/jaccard_hybrid_900')
     #G3 = build_graph_from_edgelist('graphs/jaccard_hybrid_900', G.order())
+    function_to_function(G, id_to_protein, go900, 'util_data/function_pairs')
 
 
 #-------------------------------------------------------------------------------

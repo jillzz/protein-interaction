@@ -110,6 +110,32 @@ def common_elements(set1, set2):
 
 #-------------------------------------------------------------------------------
 
+def function_to_function(graph, id_to_protein, annotation_file, path):
+    """ Build function-to-function edgelist for all functions pairs with which
+        connected nodes in the graph are annotated. The edgelist is savet at
+        the given path. This file is later used for Resnik sematic metric
+        calculation in R
+    """
+    #TODO:
+    protein_to_functions = read_in_annotations(annotation_file)
+    function_pairs = set()
+    for edge in graph.edges_iter():
+        n1 = id_to_protein[edge[0]]
+        n2 = id_to_protein[edge[1]]
+        set1 = protein_to_functions.get(n1, set())
+        set2 = protein_to_functions.get(n2, set())
+        for f1 in set1:
+            for f2 in set2:
+                pair = (min(f1, f2), max(f1, f2))
+                function_pairs.add(pair)
+
+    with open(path, 'w') as out:
+        for pair in function_pairs:
+            out.write('%s %s\n' % (pair[0], pair[1]))
+
+
+#-------------------------------------------------------------------------------
+
 def main():
     """
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
