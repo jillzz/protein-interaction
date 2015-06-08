@@ -140,6 +140,38 @@ def graph_hybrid(content_graph, structure_graph, path):
 
 #-------------------------------------------------------------------------------
 
+def protein_term_graph(graph, id_to_protein, annotation_file, path, nodes_path):
+    """ Builds protein-term graph and saves it at the given path. The nodes
+        (proteins and terms) and their IDs are saved at nodes_path
+    """
+    protein_to_functions = read_in_annotations(annotation_file)
+    ID = graph.order()
+    function_to_id = {}
+
+    for node in graph.nodes():
+        p = id_to_protein[node]
+        functions = protein_to_functions.get(p, set())
+        for f in functions:
+            if not f in function_to_id:
+                function_to_id[f] = ID
+                ID += 1
+            graph.add_edge(node, function_to_id[f])
+
+    with open(path, 'w') as out:
+        for e in graph.edges_iter():
+            out.write('%d %d\n' % (e[0], e[1]))
+
+    with open(nodes_path, 'w') as out:
+        for i in id_to_protein:
+            out.write('%d %s\n' % (i, id_to_protein[i]))
+
+    with open(nodes_path, 'a') as out:
+        for f in function_to_id:
+            out.write('%d %s\n' % (function_to_id[f], f))
+
+
+#-------------------------------------------------------------------------------
+
 def main():
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
     go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
@@ -151,7 +183,6 @@ def main():
 
     #G2 = build_graph_from_edgelist('graphs/jaccard_structure_900', G.order())
     #graph_hybrid(G1, G2, 'graphs/jaccard_hybrid_900')
-    #G3 = build_graph_from_edgelist('graphs/jaccard_hybrid_900', G.order())
 
     """RESNIK"""
     #function_to_function(G, id_to_protein, go900, 'util_data/function_pairs')
@@ -162,26 +193,20 @@ def main():
     #graph_structure(G, G1, 'graphs/resnik_structure_900')
     #G2 = build_graph_from_edgelist('graphs/resnik_structure_900', G.order())
     #graph_hybrid(G1, G2, 'graphs/resnik_hybrid_900')
-    #G3 = build_graph_from_edgelist('graphs/resnik_hybrid_900', G.order())
 
     """WANG"""
-    graph_content_semantic(G, id_to_protein, go900, \
-                          '../R-src/data/functions_sim_wang', \
-                          'graphs/wang_content_900')
-    G1 = build_graph_from_edgelist('graphs/wang_content_900', G.order())
-    graph_structure(G, G1, 'graphs/wang_structure_900')
-    G2 = build_graph_from_edgelist('graphs/wang_structure_900', G.order())
-    graph_hybrid(G1, G2, 'graphs/wang_hybrid_900')
-    G3 = build_graph_from_edgelist('graphs/wang_hybrid_900', G.order())
+    #graph_content_semantic(G, id_to_protein, go900, \
+    #                      '../R-src/data/functions_sim_wang', \
+    #                      'graphs/wang_content_900')
+    #G1 = build_graph_from_edgelist('graphs/wang_content_900', G.order())
+    #graph_structure(G, G1, 'graphs/wang_structure_900')
+    #G2 = build_graph_from_edgelist('graphs/wang_structure_900', G.order())
+    #graph_hybrid(G1, G2, 'graphs/wang_hybrid_900')
 
-    print nx.info(G)
-    print
-    print nx.info(G1)
-    print
-    print nx.info(G2)
-    print
-    print nx.info(G3)
-    print
+    """PROTEIN_TERM"""
+    #protein_term_graph(G, id_to_protein, go900, \
+    #                   'graphs/protein_term_900', \
+    #                   'graphs/protein_term_nodes')
 
 
 #-------------------------------------------------------------------------------
