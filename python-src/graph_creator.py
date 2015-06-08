@@ -29,13 +29,43 @@ def jaccard(set1, set2):
 
 #-------------------------------------------------------------------------------
 
+def sum_max_similarities (set1, set2, functions_to_similarity):
+    """ Every function in set1 is compared with every other in set2. The maximums
+        for every function in set1 are then summed."""
+    sum1 = 0.0
+    for f1 in set1:
+        m1 = 0.0
+        for f2 in set2:
+            pair = (min(f1, f2), max(f1, f2))
+            sim = functions_to_similarity.get(pair, 0)
+            if sim > m1:
+                m1 = sim
+        sum1 += m1
+
+    return sum1
+
+
+def resnik(set1, set2, functions_to_similarity):
+    """ Calculate the Resnik similarity metric of two sets. Similarities between
+        functions are given in functions_to_similarity dictionary"""
+    if not set1 or not set2:
+        return 0.0
+
+    sim1 = sum_max_similarities(set1, set2, functions_to_similarity) / len(set1)
+    sim2 = sum_max_similarities(set2, set1, functions_to_similarity) / len(set2)
+
+    resnik = max(sim1, sim2)
+    return resnik
+
+
+#-------------------------------------------------------------------------------
+
 def graph_content_jaccard(graph, id_to_protein, annotation_file, path):
     """ Builds interaction graph with content based weighs using Jaccard
         similarity metric, and save it at the given path """
     protein_to_functions = read_in_annotations(annotation_file)
     with open(path, 'w') as out:
         for e in graph.edges_iter():
-            #TODO:
             terms1 = protein_to_functions.get(id_to_protein[e[0]], None)
             terms2 = protein_to_functions.get(id_to_protein[e[1]], None)
             if terms1 and terms2:
@@ -44,10 +74,45 @@ def graph_content_jaccard(graph, id_to_protein, annotation_file, path):
             else:
                 out.write('%d %d %f\n' % (e[0], e[1], 0.0))
 
+
 #-------------------------------------------------------------------------------
 
-def graph_structure_jaccard(graph, content_graph, path):
-    """ Builds interaction graph with structure based weighs using Jaccard
+def read_in_resnik_sim_file (path):
+    """ Read in the resnik similarity file with format
+        'function function similarity' in a pair-to-similarity dictionary. """
+
+    functions_to_similarity = {}
+    with open(path, 'r') as in_file:
+        for line in in_file:
+            tokens = line.split()
+            pair = (min(tokens[0], tokens[1]), max(tokens[0], tokens[1]))
+            if tokens[2] != 'NA':
+                functions_to_similarity[pair] = float(tokens[2])
+
+    return functions_to_similarity
+
+
+def graph_content_resnik(graph, id_to_protein, annotation_file, rasnik_sim_file, path):
+    """ Builds interaction graph with content based weighs using Rasnik
+        similarity metric, and save it at the given path """
+    protein_to_functions = read_in_annotations(annotation_file)
+    functions_to_similarity = read_in_resnik_sim_file(rasnik_sim_file)
+
+    with open(path, 'w') as out:
+        for e in graph.edges_iter():
+            terms1 = protein_to_functions.get(id_to_protein[e[0]], None)
+            terms2 = protein_to_functions.get(id_to_protein[e[1]], None)
+            if terms1 and terms2:
+                R = resnik(terms1, terms2, functions_to_similarity)
+                out.write('%d %d %f\n' % (e[0], e[1], R))
+            else:
+                out.write('%d %d %f\n' % (e[0], e[1], 0.0))
+
+
+#-------------------------------------------------------------------------------
+
+def graph_structure(graph, content_graph, path):
+    """ Builds interaction graph with structure based weighs
         similarity metric, and save it at the given path """
     A = scipy.sparse.csr_matrix(nx.google_matrix(graph, alpha = 1, weight = 'weight'))
     W = nx.to_scipy_sparse_matrix(content_graph)
@@ -61,8 +126,8 @@ def graph_structure_jaccard(graph, content_graph, path):
 
 #-------------------------------------------------------------------------------
 
-def graph_hybrid_jaccard(content_graph, structure_graph, path):
-    """ Builds interaction graph with hybrid based weighs using Jaccard
+def graph_hybrid(content_graph, structure_graph, path):
+    """ Builds interaction graph with hybrid based weighs
         similarity metric, and save it at the given path """
     W1 = nx.to_scipy_sparse_matrix(content_graph)
     W2 = nx.to_scipy_sparse_matrix(structure_graph)
@@ -76,15 +141,28 @@ def graph_hybrid_jaccard(content_graph, structure_graph, path):
 def main():
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
     go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
+
+    """JACCARD"""
     #graph_content_jaccard(G, id_to_protein, go900, 'graphs/jaccard_content_900')
     #G1 = build_graph_from_edgelist('graphs/jaccard_content_900', G.order())
-    #graph_structure_jaccard(G, G1, 'graphs/jaccard_structure_900')
+    #graph_structure(G, G1, 'graphs/jaccard_structure_900')
 
     #G2 = build_graph_from_edgelist('graphs/jaccard_structure_900', G.order())
-    #graph_hybrid_jaccard(G1, G2, 'graphs/jaccard_hybrid_900')
+    #graph_hybrid(G1, G2, 'graphs/jaccard_hybrid_900')
     #G3 = build_graph_from_edgelist('graphs/jaccard_hybrid_900', G.order())
-    function_to_function(G, id_to_protein, go900, 'util_data/function_pairs')
 
+    """RESNIK"""
+    #function_to_function(G, id_to_protein, go900, 'util_data/function_pairs')
+    #graph_content_resnik(G, id_to_protein, go900, \
+    #                     '../R-src/data/functions_sim_resnik', \
+    #                     'graphs/resnik_content_900')
+    #G1 = build_graph_from_edgelist('graphs/resnik_content_900', G.order())
+    #graph_structure(G, G1, 'graphs/resnik_structure_900')
+    #G2 = build_graph_from_edgelist('graphs/resnik_structure_900', G.order())
+    #graph_hybrid(G1, G2, 'graphs/resnik_hybrid_900')
+    #G3 = build_graph_from_edgelist('graphs/resnik_hybrid_900', G.order())
+
+    """WANG"""
 
 #-------------------------------------------------------------------------------
 
