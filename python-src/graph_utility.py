@@ -100,6 +100,25 @@ def read_in_annotations(annotation_file):
 
 #-------------------------------------------------------------------------------
 
+def all_functions(graph, id_to_protein, annotation_file, path):
+    """ Finds all functions with which proteins in the graph are annotated with
+        and saves the list at the given path
+    """
+    protein_to_functions = read_in_annotations(annotation_file)
+    functions = set()
+
+    for node in graph.nodes_iter():
+        p = id_to_protein[node]
+        p_f = protein_to_functions.get(p, set())
+        functions.update(p_f)
+
+    with open(path, 'w') as out:
+        for f in functions:
+            out.write('%s\n' % f)
+
+
+#-------------------------------------------------------------------------------
+
 def common_elements(set1, set2):
     """ Find if two sets have any common element """
     for element in set1:
@@ -143,8 +162,8 @@ def main():
     save_all_shortest_paths(G, 'shortest_paths_900_improved')
     """
 
-    combine_and_sort_distance_files('distances_data/shortest_paths_900_improved', \
-                                    'distances_data/shortest_paths_900_sorted')
+    #combine_and_sort_distance_files('distances_data/shortest_paths_900_improved', \
+    #                                'distances_data/shortest_paths_900_sorted')
 
 
 #-------------------------------------------------------------------------------

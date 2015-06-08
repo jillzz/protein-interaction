@@ -18,13 +18,13 @@ f2 <- function_pairs[, 2]
 con <- file(PATH, "w")
 
 for (i in seq_along(f1)) {
-  r_sim <- goSim(f1[i], 
-                 f2[i], 
-                 ont = "MF", 
-                 organism = "human", 
-                 measure = METRIC)
+  sim <- goSim(f1[i], 
+               f2[i], 
+               ont = "MF", 
+               organism = "human", 
+               measure = METRIC)
   
-  data = paste(f1[i], f2[i], r_sim, sep = " ")
+  data = paste(f1[i], f2[i], sim, sep = " ")
   writeLines(text = data,
              con = con)
 }

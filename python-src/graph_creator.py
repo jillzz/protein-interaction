@@ -208,6 +208,7 @@ def main():
     #                   'graphs/protein_term_900', \
     #                   'graphs/protein_term_nodes')
 
+    """FULL_FUNCTIONAL"""
 
 #-------------------------------------------------------------------------------
 

@@ -24,10 +24,12 @@ def main():
     #                               'distances_data/shortest_paths_900_improved', \
     #                               'figures/function_sharing900.pdf')
 
-    plot_function_first_appearance(id_to_protein, \
-                                   go900, \
-                                   'distances_data/shortest_paths_900_sorted', \
-                                   'figures/function_appearance900.pdf', 14)
+    #plot_function_first_appearance(id_to_protein, \
+    #                               go900, \
+    #                               'distances_data/shortest_paths_900_sorted', \
+    #                               'figures/function_appearance900.pdf', 14)
+
+    all_functions(G, id_to_protein, go900, 'util_data/functions_list')
 
 
 
