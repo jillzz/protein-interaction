@@ -1,31 +1,34 @@
 # Calculate Resnik similarity
 library(GOSemSim)
 
-# Read in the protein interactions data in a data frame
-# interactions <- read.table(file = "../data/human_ppi_data_900",
-#                            header = FALSE,
-#                            sep = " ",
-#                            #only use first two columns
-#                            colClasses = c(rep("character", 2), rep("NULL", 13)),
-#                            comment.char = "",
-#                            nrows = 165376,
-#                            stringsAsFactors = FALSE)
+# Read in function-pairs data in a data frame
+function_pairs <- unique(read.table(file = "../python-src/util_data/function_pairs",
+                                   header = FALSE,
+                                   sep = " ",
+                                   colClasses = c(rep("character", 2)),
+                                   comment.char = "",
+                                   nrows = 8348,
+                                   stringsAsFactors = FALSE))
+f1 <- function_pairs[, 1]
+f2 <- function_pairs[, 2]
 
-annotations <- unique(read.table(file = "../data/go/split/human_ppi900_go_mf_clean.tsv",
-                                 header = FALSE,
-                                 sep = "\t",
-                                 colClasses = c(rep(c("NULL", "character"), 2), rep("NULL", 4)),
-                                 comment.char = "",
-                                 nrows = 11019,
-                                 stringsAsFactors = FALSE))
+con <- file("data/functions_sim_resnik", "w")
+
+for (i in seq_along(f1)) {
+  r_sim <- goSim(f1[i], 
+                 f2[i], 
+                 ont = "MF", 
+                 organism = "human", 
+                 measure = "Resnik")
+  
+  data = paste(f1[i], f2[i], r_sim, sep = " ")
+  writeLines(text = data,
+             con = con)
+}
+
+close(con)
 
 
-print(dim(annotations)) 
 
-
-
-s <- goSim("GO:0005525", "GO:0005525", ont = "MF", organism = "human", measure = "Resnik")
-
-print(s)
 
 
