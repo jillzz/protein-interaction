@@ -45,17 +45,19 @@ def sum_max_similarities (set1, set2, functions_to_similarity):
     return sum1
 
 
-def resnik(set1, set2, functions_to_similarity):
-    """ Calculate the Resnik similarity metric of two sets. Similarities between
-        functions are given in functions_to_similarity dictionary"""
+def semantic(set1, set2, functions_to_similarity):
+    """ Calculate the semantic similarity metric (Resnik or Wankg) of two sets.
+        Similarities between functions are given in functions_to_similarity
+        dictionary
+    """
     if not set1 or not set2:
         return 0.0
 
     sim1 = sum_max_similarities(set1, set2, functions_to_similarity) / len(set1)
     sim2 = sum_max_similarities(set2, set1, functions_to_similarity) / len(set2)
 
-    resnik = max(sim1, sim2)
-    return resnik
+    sim = max(sim1, sim2)
+    return sim
 
 
 #-------------------------------------------------------------------------------
@@ -77,8 +79,8 @@ def graph_content_jaccard(graph, id_to_protein, annotation_file, path):
 
 #-------------------------------------------------------------------------------
 
-def read_in_resnik_sim_file (path):
-    """ Read in the resnik similarity file with format
+def read_in_semantic_sim_file (path):
+    """ Read in the semantic similarity file with format
         'function function similarity' in a pair-to-similarity dictionary. """
 
     functions_to_similarity = {}
@@ -92,19 +94,19 @@ def read_in_resnik_sim_file (path):
     return functions_to_similarity
 
 
-def graph_content_resnik(graph, id_to_protein, annotation_file, rasnik_sim_file, path):
+def graph_content_semantic(graph, id_to_protein, annotation_file, semantic_sim_file, path):
     """ Builds interaction graph with content based weighs using Rasnik
         similarity metric, and save it at the given path """
     protein_to_functions = read_in_annotations(annotation_file)
-    functions_to_similarity = read_in_resnik_sim_file(rasnik_sim_file)
+    functions_to_similarity = read_in_semantic_sim_file(semantic_sim_file)
 
     with open(path, 'w') as out:
         for e in graph.edges_iter():
             terms1 = protein_to_functions.get(id_to_protein[e[0]], None)
             terms2 = protein_to_functions.get(id_to_protein[e[1]], None)
             if terms1 and terms2:
-                R = resnik(terms1, terms2, functions_to_similarity)
-                out.write('%d %d %f\n' % (e[0], e[1], R))
+                w = semantic(terms1, terms2, functions_to_similarity)
+                out.write('%d %d %f\n' % (e[0], e[1], w))
             else:
                 out.write('%d %d %f\n' % (e[0], e[1], 0.0))
 
@@ -153,9 +155,9 @@ def main():
 
     """RESNIK"""
     #function_to_function(G, id_to_protein, go900, 'util_data/function_pairs')
-    #graph_content_resnik(G, id_to_protein, go900, \
-    #                     '../R-src/data/functions_sim_resnik', \
-    #                     'graphs/resnik_content_900')
+    #graph_content_semantic(G, id_to_protein, go900, \
+    #                      '../R-src/data/functions_sim_resnik', \
+    #                      'graphs/resnik_content_900')
     #G1 = build_graph_from_edgelist('graphs/resnik_content_900', G.order())
     #graph_structure(G, G1, 'graphs/resnik_structure_900')
     #G2 = build_graph_from_edgelist('graphs/resnik_structure_900', G.order())
@@ -163,6 +165,24 @@ def main():
     #G3 = build_graph_from_edgelist('graphs/resnik_hybrid_900', G.order())
 
     """WANG"""
+    graph_content_semantic(G, id_to_protein, go900, \
+                          '../R-src/data/functions_sim_wang', \
+                          'graphs/wang_content_900')
+    G1 = build_graph_from_edgelist('graphs/wang_content_900', G.order())
+    graph_structure(G, G1, 'graphs/wang_structure_900')
+    G2 = build_graph_from_edgelist('graphs/wang_structure_900', G.order())
+    graph_hybrid(G1, G2, 'graphs/wang_hybrid_900')
+    G3 = build_graph_from_edgelist('graphs/wang_hybrid_900', G.order())
+
+    print nx.info(G)
+    print
+    print nx.info(G1)
+    print
+    print nx.info(G2)
+    print
+    print nx.info(G3)
+    print
+
 
 #-------------------------------------------------------------------------------
 
