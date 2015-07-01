@@ -4,6 +4,7 @@
 import networkx as nx
 import scipy.io
 import itertools
+import sys
 from graph_utility import *
 from interaction_graph_builder import *
 
@@ -169,6 +170,60 @@ def protein_term_graph(graph, id_to_protein, annotation_file, path, nodes_path):
         for f in function_to_id:
             out.write('%d %s\n' % (function_to_id[f], f))
 
+
+#-------------------------------------------------------------------------------
+
+def random_walk_save (graph, from_node, to_node, restart_prob, path, max_iterations = 50, threshold = 1e-04):
+    """ Calculate and save at the given path, personalized pageranks for all
+        nodes of the graph within range [from_node, to_node]. max_iterations and
+        threshold are used for estimating the convergence, and restart_prob is
+        the damping factor
+    """
+    # preprocess the graph
+    remove_zero_weights_from_graph(graph)
+    graph = graph.to_directed()
+
+    #personalization = dict((i, 0.0) for i in graph.nodes_iter())
+
+
+    for node1 in xrange(from_node, to_node):
+        #personalization[node1] = 1.0
+
+        p = pagerank2(graph, restart_prob, node1, max_iterations, threshold)
+        #p = nx.pagerank(graph, 1-restart_prob, personalization, max_iterations, threshold, personalization, 'weight')
+
+        with open(path, 'a') as out:
+            node2 = 0
+            while node2 < len(p):
+                out.write('%d %d %f\n' % (node1, node2, p[node2]))
+                node2 += 1
+
+        #personalization[node1] = 0.0
+
+
+#-------------------------------------------------------------------------------
+
+def random_walk_graph (graph, pagerank_paths, path):
+    """ TODO """
+    edges = {}
+    with open(pagerank_paths, 'r') as in_file:
+        with open(path, 'w') as out_file:
+            for line in in_file:
+                tokens = line.split()
+                n1 = int(tokens[0])
+                n2 = int(tokens[1])
+                w = float(tokens[2])
+                if graph.has_edge(n1, n2):
+                    e = (min(n1, n2), max(n1, n2))
+                    d = 1.0 - w
+                    if e in edges:
+                        edges[e] = (edges[e] + d) / 2.0
+                        out_file.write('%d %d %f\n' % (e[0], e[1], edges[e]))
+                    else:
+                        edges[e] = d
+
+    return edges                		
+	
 
 #-------------------------------------------------------------------------------
 

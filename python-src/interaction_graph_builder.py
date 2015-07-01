@@ -53,10 +53,13 @@ def build_graph_from_edgelist(path, nodes = None):
             tokens = line.split()
             node1 = int(tokens[0])
             node2 = int(tokens[1])
-            G.add_edge(node1, node2)
             if len(tokens) > 2:
                 w = float(tokens[2])
-                G[node1][node2]['weight'] = w
+                if w > 0.0 or w < 0.0:
+                    G.add_edge(node1, node2)
+                    G[node1][node2]['weight'] = w
+            else:
+                G.add_edge(node1, node2)
 
     return G
 

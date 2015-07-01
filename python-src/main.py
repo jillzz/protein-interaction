@@ -2,36 +2,26 @@
 # -*- coding: utf-8 -*-
 
 import networkx as nx
+import time
 from interaction_graph_builder import *
 from interaction_graph_info import *
+from graph_utility import *
+from graph_creator import *
+
+
+#------------------------------------------------------------------------------
 
 def main():
+    start = time.time()
     G, id_to_protein = build_graph('../data/human_ppi_data_900')
-    go700 = '../data/go/split/human_ppi700_go_mf_clean.tsv'
-    go900 = '../data/go/split/human_ppi900_go_mf_clean.tsv'
-
-    #save_shortest_paths(G, 'shortest_paths_700_improved.txt')
-
-    #plot_degree_dist (G, 'figures/degree_distribution900.pdf')
-    #pearson = nx.degree_pearson_correlation_coefficient(G)
-    #plot_clustering_spectrum (G, 'figures/clustering_spectrum700.pdf')
-    #plot_shortest_path_spectrum (G, 'figures/distance_spectrum900_new.pdf', \
-    #                             'distances_data/shortest_paths_900_improved')
-    #plot_closeness_dist (G, 'figures/closeness_distribution700.pdf')
-    #plot_betweenness_dist (G, 'figures/betweenness_distribution700.pdf')
-    #plot_proteins_sharing_function(id_to_protein, \
-    #                               go900, \
-    #                               'distances_data/shortest_paths_900_improved', \
-    #                               'figures/function_sharing900.pdf')
-
-    #plot_function_first_appearance(id_to_protein, \
-    #                               go900, \
-    #                               'distances_data/shortest_paths_900_sorted', \
-    #                               'figures/function_appearance900.pdf', 14)
-
-    all_functions(G, id_to_protein, go900, 'util_data/functions_list')
+    random_walk_graph (G,
+                      'graphs/random_walk_wang_hybrid_900',
+                      'graphs/final/rw_wh_900')
+    end = time.time()
+    print 'Task finished in: %f min.' % ((end-start) / 60.0)
 
 
+#------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     main()
