@@ -204,7 +204,10 @@ def random_walk_save (graph, from_node, to_node, restart_prob, path, max_iterati
 #-------------------------------------------------------------------------------
 
 def random_walk_graph (graph, pagerank_paths, path):
-    """ TODO """
+    """ Build the graph with random walk based distances where
+        w{n1, n2} = (p_n2[n1] + p_n1[n2]) / 2, where p_ni is the stationary
+        distribution obtained with personalized pagerank from ni
+    """
     edges = {}
     with open(pagerank_paths, 'r') as in_file:
         with open(path, 'w') as out_file:

@@ -31,7 +31,7 @@ def build_graph (path):
 
 #-------------------------------------------------------------------------------
 
-def get_largest_componenet (graph):
+def get_largest_component (graph):
     """Get the largest connected componenet from the graph"""
     SG = sorted( list(nx.connected_component_subgraphs(graph)), \
                  key = lambda sg: sg.order(), \
