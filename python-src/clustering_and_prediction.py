@@ -36,7 +36,7 @@ def louvain (graph):
     return multilevel
 
 
-def louvain_best(graph):h
+def louvain_best(graph):
     """ Lovain clustering, returns only the best clustering """
     partition = community.best_partition(graph)
     return {0: to_clusters_dict (partition)}
